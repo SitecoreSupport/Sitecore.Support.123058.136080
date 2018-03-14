@@ -105,7 +105,8 @@ namespace Sitecore.Support.CrmCampaignIntegration.Submit
                             bool flag = fields.IsTrueStatement(field.EditMode);
                             if (flag && (this.EntitySettings.OverwriteNotEmptyField || string.IsNullOrEmpty(propertyValue)))
                             {
-                                this.SetProperty(field.Name, field.AttributeType, str, entity, new string[] { field.EntityReference, this.EntitySettings.EntityName, this.EntitySettings.PrimaryKey });
+                                
+                                this.SetProperty(field.Name, field.AttributeType, str, entity, this.GetFieldTypeParameters(field));
                             }
                             if ((string.Compare(str, propertyValue, true) != 0) || this.isCreated)
                             {
@@ -130,6 +131,18 @@ namespace Sitecore.Support.CrmCampaignIntegration.Submit
                     }
                 }
             }
+        }
+
+        protected virtual string[] GetFieldTypeParameters(XCrmField field)
+        {
+            var parameters = new List<string>();
+            parameters.Add(field.EntityReference);
+            if (field.AttributeType != CrmAttributeType.Lookup)
+            {
+                parameters.Add(this.EntitySettings.EntityName);
+                parameters.Add(this.EntitySettings.PrimaryKey);
+            }
+            return parameters.ToArray();
         }
 
         public ActionCallContext Context { get; set; }
